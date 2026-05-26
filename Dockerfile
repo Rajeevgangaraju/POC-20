@@ -1,11 +1,5 @@
-FROM golang:1.21-alpine AS builder
+FROM python:3.11-slim
 WORKDIR /app
-COPY main.go .
-RUN go build -o main main.go
-
-FROM alpine:latest
-WORKDIR /root/
-COPY --from=builder /app/main .
+COPY main.py .
 EXPOSE 8080
-CMD ["./main"]
-
+CMD ["python", "main.py"]
