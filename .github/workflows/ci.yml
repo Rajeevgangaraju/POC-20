@@ -16,8 +16,9 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      # ✅ FIXED LOGIN
       - name: Login to Docker Hub
-        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+        run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Build Docker Image
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/poc20:${{ github.sha }} .
@@ -30,10 +31,16 @@ jobs:
         run: |
           sed -i 's|image:.*|image: ${{ secrets.DOCKER_USERNAME }}/poc20:${{ github.sha }}|' kustomize/base/deployment.yaml
 
+      # ✅ FIXED GIT AUTH
+      - name: Setup Git Auth
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+
+      # ✅ SAFE COMMIT
       - name: Commit & Push Changes
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
           git add .
-          git commit -m "Update image tag"
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update image tag"
           git push
