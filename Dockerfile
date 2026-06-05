@@ -1,7 +1,14 @@
-FROM python:3.11-slim
+FROM golang:1.21-alpine
+
 WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-COPY main.py .
+
+COPY . .
+
+RUN go mod init poc20 || true
+RUN go mod tidy
+
+RUN go build -o main .
+
 EXPOSE 8080
-CMD ["python", "main.py"]
+
+CMD ["./main"]
