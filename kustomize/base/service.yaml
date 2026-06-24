@@ -3,12 +3,10 @@ kind: Service
 metadata:
   name: py-app-service
 spec:
-  type: NodePort
   selector:
     app: py-app
   ports:
     - protocol: TCP
       port: 80
-      targetport: 5000
-      nodeport: 30885
-
+      targetPort: 5000
+  type: NodePort
